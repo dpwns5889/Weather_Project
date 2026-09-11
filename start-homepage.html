@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘, 여기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#20242C;
+    --ink-soft:#5B5F67;
+    --ink-faint:#8B8E93;
+    --paper:#EDE7D9;
+    --paper-deep:#E4DCC8;
+    --red:#B23A2E;
+    --green:#4B6B5A;
+    --gold:#C39A56;
+    --line: rgba(32,36,44,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans KR', sans-serif;
+    font-weight:400;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .page{
+    max-width:680px;
+    margin:0 auto;
+    padding:48px 24px 80px;
+  }
+  @media (max-width:520px){
+    .page{padding:32px 18px 64px;}
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:28px;
+  }
+  .masthead .date-block .greeting{
+    font-size:13px;
+    color:var(--ink-soft);
+    letter-spacing:0.02em;
+    margin-bottom:6px;
+  }
+  .masthead .date-block h1{
+    font-family:'Noto Serif KR', serif;
+    font-weight:700;
+    font-size:30px;
+    margin:0;
+    line-height:1.25;
+  }
+  .masthead .date-block .sub{
+    font-size:13px;
+    color:var(--ink-faint);
+    margin-top:6px;
+  }
+  .refresh-btn{
+    border:1px solid var(--line);
+    background:transparent;
+    width:38px;height:38px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    color:var(--ink-soft);
+    flex-shrink:0;
+    transition:transform .5s ease, border-color .2s ease;
+  }
+  .refresh-btn:hover{border-color:var(--ink-soft);}
+  .refresh-btn.spinning svg{animation:spin .7s linear;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---------- Weather hero ---------- */
+  .weather-hero{
+    position:relative;
+    border-radius:18px;
+    padding:30px 28px;
+    color:#F4EFE3;
+    overflow:hidden;
+    min-height:200px;
+    background:linear-gradient(160deg,#2B3350,#5C6B8A 60%, #B9A98C);
+    transition:background 1s ease;
+  }
+  .weather-hero.sky-dawn{background:linear-gradient(160deg,#3A3B5C,#7C6A82 55%,#E3A97E);}
+  .weather-hero.sky-day{background:linear-gradient(160deg,#3E77A6,#7FAFC9 55%,#E9DCB8);}
+  .weather-hero.sky-dusk{background:linear-gradient(160deg,#2E2B4A,#7A5568 55%,#D98B5F);}
+  .weather-hero.sky-night{background:linear-gradient(160deg,#12141F,#2A2E45 60%,#4A4E68);}
+
+  .weather-hero .loc-row{
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:13px; color:rgba(244,239,227,0.85); margin-bottom:18px;
+  }
+  .weather-hero .loc-row .loc-name{letter-spacing:0.02em;}
+  .weather-top{
+    display:flex; align-items:center; gap:18px;
+  }
+  .weather-icon{width:64px;height:64px;flex-shrink:0;}
+  .temp-block .temp{
+    font-family:'Noto Serif KR', serif;
+    font-size:56px;
+    font-weight:600;
+    line-height:1;
+  }
+  .temp-block .cond{
+    font-size:15px;
+    margin-top:6px;
+    color:rgba(244,239,227,0.92);
+  }
+  .weather-meta{
+    display:flex;
+    gap:22px;
+    margin-top:22px;
+    font-size:13px;
+    color:rgba(244,239,227,0.85);
+    flex-wrap:wrap;
+  }
+  .weather-meta span b{font-weight:500;color:#fff;}
+  .weather-state{
+    font-size:13px;
+    color:rgba(244,239,227,0.75);
+  }
+
+  /* ---------- Divider ---------- */
+  .divider{
+    border:none;
+    border-top:1px solid var(--line);
+    margin:40px 0 28px;
+  }
+
+  /* ---------- News ---------- */
+  .news-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:18px;
+  }
+  .news-head h2{
+    font-family:'Noto Serif KR', serif;
+    font-size:20px;
+    font-weight:600;
+    margin:0;
+  }
+  .news-head .news-updated{
+    font-size:12px;
+    color:var(--ink-faint);
+  }
+  .news-list{list-style:none;margin:0;padding:0;}
+  .news-item{
+    padding:16px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .news-item:first-child{padding-top:0;}
+  .news-item a{
+    color:var(--ink);
+    text-decoration:none;
+    font-size:16px;
+    line-height:1.5;
+    font-weight:500;
+  }
+  .news-item a:hover{color:var(--red);}
+  .news-item .meta{
+    margin-top:6px;
+    font-size:12.5px;
+    color:var(--ink-faint);
+  }
+  .news-state, .news-error{
+    font-size:14px;
+    color:var(--ink-soft);
+    padding:20px 0;
+  }
+  .news-error a{color:var(--green);}
+
+  footer{
+    margin-top:44px;
+    font-size:12px;
+    color:var(--ink-faint);
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="date-block">
+      <div class="greeting" id="greeting">&nbsp;</div>
+      <h1 id="dateTitle">&nbsp;</h1>
+      <div class="sub" id="dateSub">&nbsp;</div>
+    </div>
+    <button class="refresh-btn" id="refreshBtn" title="새로고침" aria-label="새로고침">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="23 4 23 10 17 10"></polyline>
+        <polyline points="1 20 1 14 7 14"></polyline>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+      </svg>
+    </button>
+  </header>
+
+  <section class="weather-hero" id="weatherHero">
+    <div class="loc-row">
+      <span class="loc-name" id="locName">위치 확인 중…</span>
+      <span id="weatherState" class="weather-state"></span>
+    </div>
+    <div class="weather-top">
+      <div class="weather-icon" id="weatherIcon"></div>
+      <div class="temp-block">
+        <div class="temp" id="tempNow">--°</div>
+        <div class="cond" id="condText">날씨 정보를 불러오는 중…</div>
+      </div>
+    </div>
+    <div class="weather-meta" id="weatherMeta"></div>
+  </section>
+
+  <hr class="divider">
+
+  <section class="news">
+    <div class="news-head">
+      <h2>오늘의 주요 뉴스</h2>
+      <span class="news-updated" id="newsUpdated"></span>
+    </div>
+    <div id="newsBody">
+      <div class="news-state">뉴스를 불러오는 중…</div>
+    </div>
+  </section>
+
+  <footer>나만의 시작 페이지 · 날씨는 Open-Meteo, 뉴스는 Google 뉴스 기준입니다</footer>
+
+</div>
+
+<script>
+  // ---------- Fallback location: 안산시, 경기도 ----------
+  const FALLBACK = { lat: 37.3236, lon: 126.8219, name: "안산시, 경기도" };
+
+  const dateTitle = document.getElementById('dateTitle');
+  const dateSub = document.getElementById('dateSub');
+  const greetingEl = document.getElementById('greeting');
+
+  function renderDate(){
+    const now = new Date();
+    const days = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+    const hour = now.getHours();
+    let greeting = '좋은 아침이에요';
+    if(hour >= 12 && hour < 17) greeting = '좋은 오후예요';
+    else if(hour >= 17 && hour < 21) greeting = '편안한 저녁이에요';
+    else if(hour >= 21 || hour < 5) greeting = '늦은 밤이네요';
+    greetingEl.textContent = greeting;
+    dateTitle.textContent = `${now.getMonth()+1}월 ${now.getDate()}일 ${days[now.getDay()]}`;
+    dateSub.textContent = now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'}) + ' 기준';
+    return now;
+  }
+
+  // ---------- Weather icons (inline SVG, single stroke style) ----------
+  function iconSVG(kind, isDay){
+    const stroke = '#F4EFE3';
+    const fill = 'rgba(244,239,227,0.18)';
+    const common = `fill="none" stroke="${stroke}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"`;
+    if(kind === 'clear'){
+      return isDay
+        ? `<svg viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="12" ${common} fill="${fill}"/>${[0,45,90,135,180,225,270,315].map(a=>`<line x1="32" y1="10" x2="32" y2="16" ${common} transform="rotate(${a} 32 32)"/>`).join('')}</svg>`
+        : `<svg viewBox="0 0 64 64" width="64" height="64"><path d="M40 14a18 18 0 1 0 12 30 14 14 0 0 1-12-30z" ${common} fill="${fill}"/></svg>`;
+    }
+    if(kind === 'cloud'){
+      return `<svg viewBox="0 0 64 64" width="64" height="64"><path d="M20 42a10 10 0 0 1 1-20 13 13 0 0 1 25-4 9 9 0 0 1 3 18z" ${common} fill="${fill}"/></svg>`;
+    }
+    if(kind === 'fog'){
+      return `<svg viewBox="0 0 64 64" width="64" height="64">
+        <path d="M18 26a10 10 0 0 1 20-3 8 8 0 0 1 8 7" ${common} fill="${fill}"/>
+        <line x1="12" y1="38" x2="52" y2="38" ${common}/>
+        <line x1="16" y1="46" x2="48" y2="46" ${common}/>
+      </svg>`;
+    }
+    if(kind === 'rain'){
+      return `<svg viewBox="0 0 64 64" width="64" height="64">
+        <path d="M18 30a10 10 0 0 1 1-20 13 13 0 0 1 25-3 9 9 0 0 1 3 17z" ${common} fill="${fill}"/>
+        <line x1="24" y1="42" x2="21" y2="52" ${common}/>
+        <line x1="34" y1="42" x2="31" y2="52" ${common}/>
+        <line x1="44" y1="42" x2="41" y2="52" ${common}/>
+      </svg>`;
+    }
+    if(kind === 'snow'){
+      return `<svg viewBox="0 0 64 64" width="64" height="64">
+        <path d="M18 28a10 10 0 0 1 1-20 13 13 0 0 1 25-3 9 9 0 0 1 3 17z" ${common} fill="${fill}"/>
+        <line x1="24" y1="44" x2="24" y2="52" ${common}/>
+        <line x1="20" y1="48" x2="28" y2="48" ${common}/>
+        <line x1="40" y1="44" x2="40" y2="52" ${common}/>
+        <line x1="36" y1="48" x2="44" y2="48" ${common}/>
+      </svg>`;
+    }
+    if(kind === 'storm'){
+      return `<svg viewBox="0 0 64 64" width="64" height="64">
+        <path d="M18 28a10 10 0 0 1 1-20 13 13 0 0 1 25-3 9 9 0 0 1 3 17z" ${common} fill="${fill}"/>
+        <polyline points="34 40 27 50 34 50 28 60" ${common}/>
+      </svg>`;
+    }
+    return `<svg viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="12" ${common} fill="${fill}"/></svg>`;
+  }
+
+  function mapWeatherCode(code){
+    if(code === 0) return {label:'맑음', icon:'clear'};
+    if([1,2].includes(code)) return {label:'대체로 맑음', icon:'clear'};
+    if(code === 3) return {label:'흐림', icon:'cloud'};
+    if([45,48].includes(code)) return {label:'안개', icon:'fog'};
+    if([51,53,55,56,57,80,81,82].includes(code)) return {label:'비', icon:'rain'};
+    if([61,63,65,66,67].includes(code)) return {label:'비', icon:'rain'};
+    if([71,73,75,77,85,86].includes(code)) return {label:'눈', icon:'snow'};
+    if([95,96,99].includes(code)) return {label:'천둥번개', icon:'storm'};
+    return {label:'흐림', icon:'cloud'};
+  }
+
+  function skyClass(hour, isDay){
+    if(!isDay) return 'sky-night';
+    if(hour < 8) return 'sky-dawn';
+    if(hour < 17) return 'sky-day';
+    return 'sky-dusk';
+  }
+
+  async function loadWeather(coords, label){
+    const locNameEl = document.getElementById('locName');
+    const stateEl = document.getElementById('weatherState');
+    locNameEl.textContent = label;
+    stateEl.textContent = '불러오는 중…';
+    try{
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const cur = data.current;
+      const info = mapWeatherCode(cur.weather_code);
+      const hour = new Date().getHours();
+
+      document.getElementById('weatherHero').className = 'weather-hero ' + skyClass(hour, cur.is_day === 1);
+      document.getElementById('weatherIcon').innerHTML = iconSVG(info.icon, cur.is_day === 1);
+      document.getElementById('tempNow').textContent = Math.round(cur.temperature_2m) + '°';
+      document.getElementById('condText').textContent = info.label;
+      const hi = Math.round(data.daily.temperature_2m_max[0]);
+      const lo = Math.round(data.daily.temperature_2m_min[0]);
+      document.getElementById('weatherMeta').innerHTML =
+        `<span>최고 <b>${hi}°</b></span><span>최저 <b>${lo}°</b></span>` +
+        `<span>체감 <b>${Math.round(cur.apparent_temperature)}°</b></span>` +
+        `<span>습도 <b>${cur.relative_humidity_2m}%</b></span>`;
+      stateEl.textContent = '';
+    }catch(err){
+      document.getElementById('condText').textContent = '날씨 정보를 불러오지 못했습니다';
+      stateEl.textContent = '';
+    }
+  }
+
+  function initWeather(){
+    if(navigator.geolocation){
+      const timeout = setTimeout(()=> loadWeather(FALLBACK, FALLBACK.name), 3000);
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          clearTimeout(timeout);
+          loadWeather({lat:pos.coords.latitude, lon:pos.coords.longitude}, '현재 위치');
+        },
+        () => {
+          clearTimeout(timeout);
+          loadWeather(FALLBACK, FALLBACK.name);
+        },
+        {timeout:3000}
+      );
+    }else{
+      loadWeather(FALLBACK, FALLBACK.name);
+    }
+  }
+
+  // ---------- News ----------
+  function timeAgo(dateStr){
+    const diffMs = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diffMs/60000);
+    if(mins < 60) return `${Math.max(mins,1)}분 전`;
+    const hrs = Math.floor(mins/60);
+    if(hrs < 24) return `${hrs}시간 전`;
+    return `${Math.floor(hrs/24)}일 전`;
+  }
+
+  function parseGoogleTitle(raw){
+    const idx = raw.lastIndexOf(' - ');
+    if(idx > -1){
+      return { title: raw.slice(0, idx), source: raw.slice(idx+3) };
+    }
+    return { title: raw, source: '' };
+  }
+
+  async function loadNews(){
+    const body = document.getElementById('newsBody');
+    const updated = document.getElementById('newsUpdated');
+    body.innerHTML = '<div class="news-state">뉴스를 불러오는 중…</div>';
+    const feedUrl = 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko';
+    try{
+      const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feedUrl));
+      const data = await res.json();
+      if(data.status !== 'ok' || !data.items || !data.items.length) throw new Error('empty');
+      const items = data.items.slice(0, 8);
+      body.innerHTML = '<ul class="news-list"></ul>';
+      const list = body.querySelector('.news-list');
+      items.forEach(item => {
+        const parsed = parseGoogleTitle(item.title || '');
+        const li = document.createElement('li');
+        li.className = 'news-item';
+        li.innerHTML = `<a href="${item.link}" target="_blank" rel="noopener noreferrer">${parsed.title}</a>
+          <div class="meta">${parsed.source ? parsed.source + ' · ' : ''}${timeAgo(item.pubDate)}</div>`;
+        list.appendChild(li);
+      });
+      updated.textContent = new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}) + ' 업데이트';
+    }catch(err){
+      body.innerHTML = `<div class="news-error">뉴스를 불러오지 못했습니다. <a href="https://news.google.com" target="_blank" rel="noopener noreferrer">Google 뉴스에서 보기</a></div>`;
+      updated.textContent = '';
+    }
+  }
+
+  // ---------- Init ----------
+  renderDate();
+  initWeather();
+  loadNews();
+
+  document.getElementById('refreshBtn').addEventListener('click', (e)=>{
+    const btn = e.currentTarget;
+    btn.classList.add('spinning');
+    renderDate();
+    initWeather();
+    loadNews();
+    setTimeout(()=> btn.classList.remove('spinning'), 700);
+  });
+</script>
+
+</body>
+</html>
